@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shift Swap Finder</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>* { margin:0; padding:0; box-sizing:border-box; } body { background:#16213e; }</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useMemo } = React;
+
+    const employees = [
+      {name:"James Turner",id:9662,unit:"Unit 3",mostEarly:"03:30 AM",otherEarly:["06:00 AM","04:00 AM","03:00 AM"],mostLate:"11:00 AM",otherLate:["01:00 PM","01:30 PM","03:30 PM"],night:"YES"},
+      {name:"Li Wang",id:9281,unit:"Unit 1",mostEarly:"06:00 AM",otherEarly:["03:30 AM","04:30 AM","05:00 AM"],mostLate:"12:30 PM",otherLate:["02:00 PM","10:30 AM","02:30 PM"],night:"NO"},
+      {name:"Leo Walker",id:4107,unit:"Unit 1",mostEarly:"05:30 AM",otherEarly:["05:00 AM","06:00 AM","03:00 AM"],mostLate:"05:00 PM",otherLate:["12:30 PM","02:00 PM","10:30 AM"],night:"YES"},
+      {name:"William Brown",id:1635,unit:"Unit 1",mostEarly:"05:30 AM",otherEarly:["06:00 AM","04:30 AM","05:00 AM"],mostLate:"01:00 PM",otherLate:["02:00 PM","11:30 AM","05:00 PM"],night:"MAYBE"},
+      {name:"Aarav Singh",id:5481,unit:"Unit 1",mostEarly:"03:30 AM",otherEarly:["04:30 AM","04:00 AM","05:00 AM"],mostLate:"02:00 PM",otherLate:["04:00 PM","11:30 AM","04:30 PM"],night:"MAYBE"},
+      {name:"James Johnson",id:4988,unit:"Unit 3",mostEarly:"05:30 AM",otherEarly:["04:00 AM","05:00 AM","03:30 AM"],mostLate:"01:30 PM",otherLate:["10:30 AM","02:30 PM","11:00 AM"],night:"YES"},
+      {name:"Ella Walker",id:4203,unit:"Unit 2",mostEarly:"03:00 AM",otherEarly:["05:00 AM","03:30 AM","04:00 AM"],mostLate:"03:00 PM",otherLate:["02:00 PM","01:30 PM","04:30 PM"],night:"MAYBE"},
+      {name:"Chloe Taylor",id:2912,unit:"Unit 3",mostEarly:"03:00 AM",otherEarly:["06:00 AM","05:30 AM","05:00 AM"],mostLate:"05:00 PM",otherLate:["01:00 PM","04:00 PM","12:30 PM"],night:"YES"},
+      {name:"Emily Walker",id:4428,unit:"Unit 1",mostEarly:"05:30 AM",otherEarly:["04:30 AM","05:00 AM","06:00 AM"],mostLate:"03:00 PM",otherLate:["04:00 PM","02:00 PM","12:30 PM"],night:"MAYBE"},
+      {name:"William Brown",id:3324,unit:"Unit 3",mostEarly:"05:30 AM",otherEarly:["03:30 AM","03:00 AM","05:00 AM"],mostLate:"10:30 AM",otherLate:["01:30 PM","11:30 AM","04:30 PM"],night:"MAYBE"},
+      {name:"Charlie Brown",id:7116,unit:"Unit 1",mostEarly:"04:00 AM",otherEarly:["05:00 AM","03:00 AM","03:30 AM"],mostLate:"01:00 PM",otherLate:["03:00 PM","12:00 PM","02:00 PM"],night:"MAYBE"},
+      {name:"Grace Taylor",id:8339,unit:"Unit 3",mostEarly:"04:30 AM",otherEarly:["03:00 AM","04:00 AM","06:00 AM"],mostLate:"01:30 PM",otherLate:["04:00 PM","05:00 PM","11:30 AM"],night:"NO"},
+      {name:"Ella Hall",id:9942,unit:"Unit 1",mostEarly:"05:00 AM",otherEarly:["04:00 AM","03:00 AM","06:00 AM"],mostLate:"04:30 PM",otherLate:["12:00 PM","12:30 PM","05:00 PM"],night:"NO"},
+      {name:"Riya Patel",id:2449,unit:"Unit 3",mostEarly:"05:30 AM",otherEarly:["04:30 AM","06:00 AM","04:00 AM"],mostLate:"10:30 AM",otherLate:["01:30 PM","12:00 PM","02:30 PM"],night:"NO"},
+      {name:"James Wright",id:7121,unit:"Unit 1",mostEarly:"04:30 AM",otherEarly:["04:00 AM","05:00 AM","06:00 AM"],mostLate:"10:30 AM",otherLate:["03:30 PM","04:30 PM","05:00 PM"],night:"NO"},
+      {name:"Mia Taylor",id:8777,unit:"Unit 2",mostEarly:"03:30 AM",otherEarly:["05:30 AM","04:30 AM","03:00 AM"],mostLate:"05:00 PM",otherLate:["03:30 PM","10:30 AM","12:30 PM"],night:"NO"},
+      {name:"Riya Bhuva",id:8530,unit:"Unit 2",mostEarly:"06:00 AM",otherEarly:["05:30 AM","04:00 AM","04:30 AM"],mostLate:"04:00 PM",otherLate:["01:00 PM","10:30 AM","02:00 PM"],night:"MAYBE"},
+      {name:"Jack Robinson",id:2860,unit:"Unit 1",mostEarly:"04:30 AM",otherEarly:["03:00 AM","05:30 AM","05:00 AM"],mostLate:"01:30 PM",otherLate:["11:00 AM","12:00 PM","02:30 PM"],night:"YES"},
+      {name:"William Wright",id:2653,unit:"Unit 1",mostEarly:"04:30 AM",otherEarly:["03:30 AM","03:00 AM","04:00 AM"],mostLate:"02:30 PM",otherLate:["01:30 PM","12:30 PM","04:30 PM"],night:"YES"},
+      {name:"Jack Thompson",id:3581,unit:"Unit 3",mostEarly:"06:00 AM",otherEarly:["03:00 AM","04:00 AM","03:30 AM"],mostLate:"12:00 PM",otherLate:["03:30 PM","02:30 PM","01:00 PM"],night:"YES"},
+      {name:"George Green",id:1771,unit:"Unit 2",mostEarly:"05:00 AM",otherEarly:["03:30 AM","06:00 AM","04:00 AM"],mostLate:"02:30 PM",otherLate:["05:00 PM","03:00 PM","11:30 AM"],night:"YES"},
+      {name:"James Taylor",id:6914,unit:"Unit 2",mostEarly:"04:00 AM",otherEarly:["05:30 AM","03:30 AM","06:00 AM"],mostLate:"01:30 PM",otherLate:["03:00 PM","04:00 PM","10:30 AM"],night:"NO"},
+      {name:"Thomas Wood",id:6433,unit:"Unit 2",mostEarly:"03:30 AM",otherEarly:["04:30 AM","03:00 AM","05:00 AM"],mostLate:"02:00 PM",otherLate:["04:00 PM","01:00 PM","11:30 AM"],night:"NO"},
+      {name:"Jack Smith",id:6546,unit:"Unit 2",mostEarly:"04:00 AM",otherEarly:["05:30 AM","03:30 AM","06:00 AM"],mostLate:"02:00 PM",otherLate:["05:00 PM","01:00 PM","12:30 PM"],night:"NO"},
+      {name:"Rohan Zhang",id:2686,unit:"Unit 3",mostEarly:"06:00 AM",otherEarly:["03:00 AM","05:30 AM","03:30 AM"],mostLate:"02:30 PM",otherLate:["03:00 PM","01:00 PM","11:00 AM"],night:"NO"},
+      {name:"Mia Wood",id:2687,unit:"Unit 1",mostEarly:"03:00 AM",otherEarly:["06:00 AM","04:30 AM","05:00 AM"],mostLate:"01:30 PM",otherLate:["04:00 PM","03:30 PM","02:00 PM"],night:"NO"},
+      {name:"Ava Williams",id:7272,unit:"Unit 2",mostEarly:"06:00 AM",otherEarly:["05:30 AM","03:30 AM","03:00 AM"],mostLate:"02:00 PM",otherLate:["03:00 PM","12:30 PM","12:00 PM"],night:"NO"},
+      {name:"Rohan Chen",id:8426,unit:"Unit 2",mostEarly:"03:00 AM",otherEarly:["05:30 AM","05:00 AM","06:00 AM"],mostLate:"02:30 PM",otherLate:["11:00 AM","10:30 AM","11:30 AM"],night:"MAYBE"},
+      {name:"Grace Davies",id:3306,unit:"Unit 2",mostEarly:"05:00 AM",otherEarly:["05:30 AM","06:00 AM","04:00 AM"],mostLate:"10:30 AM",otherLate:["03:30 PM","01:30 PM","02:00 PM"],night:"NO"},
+      {name:"George Walker",id:9741,unit:"Unit 2",mostEarly:"04:00 AM",otherEarly:["04:30 AM","03:30 AM","06:00 AM"],mostLate:"11:00 AM",otherLate:["12:30 PM","02:30 PM","03:30 PM"],night:"YES"},
+      {name:"Mia Johnson",id:7283,unit:"Unit 1",mostEarly:"04:30 AM",otherEarly:["05:30 AM","03:30 AM","04:00 AM"],mostLate:"12:00 PM",otherLate:["04:00 PM","01:00 PM","05:00 PM"],night:"MAYBE"},
+      {name:"Arjun Wang",id:3622,unit:"Unit 3",mostEarly:"06:00 AM",otherEarly:["03:00 AM","05:00 AM","04:00 AM"],mostLate:"11:00 AM",otherLate:["12:30 PM","10:30 AM","02:00 PM"],night:"YES"},
+      {name:"Priya Bhuva",id:7138,unit:"Unit 3",mostEarly:"04:00 AM",otherEarly:["05:00 AM","05:30 AM","03:30 AM"],mostLate:"03:00 PM",otherLate:["02:30 PM","11:30 AM","01:30 PM"],night:"MAYBE"},
+      {name:"Olivia Edwards",id:3765,unit:"Unit 1",mostEarly:"04:30 AM",otherEarly:["04:00 AM","06:00 AM","03:00 AM"],mostLate:"10:30 AM",otherLate:["05:00 PM","02:00 PM","04:00 PM"],night:"YES"},
+      {name:"Ella Hughes",id:9681,unit:"Unit 2",mostEarly:"03:30 AM",otherEarly:["05:30 AM","05:00 AM","03:00 AM"],mostLate:"02:30 PM",otherLate:["04:00 PM","11:00 AM","11:30 AM"],night:"YES"},
+      {name:"Sophia Johnson",id:8502,unit:"Unit 1",mostEarly:"05:30 AM",otherEarly:["05:00 AM","03:00 AM","06:00 AM"],mostLate:"04:30 PM",otherLate:["02:30 PM","10:30 AM","12:00 PM"],night:"MAYBE"},
+      {name:"William Wright",id:9643,unit:"Unit 3",mostEarly:"06:00 AM",otherEarly:["03:30 AM","04:30 AM","05:00 AM"],mostLate:"03:00 PM",otherLate:["11:00 AM","03:30 PM","10:30 AM"],night:"YES"},
+      {name:"Neha Chen",id:7130,unit:"Unit 3",mostEarly:"05:00 AM",otherEarly:["04:30 AM","04:00 AM","06:00 AM"],mostLate:"12:00 PM",otherLate:["03:00 PM","02:00 PM","10:30 AM"],night:"YES"},
+      {name:"Jack Wright",id:8985,unit:"Unit 3",mostEarly:"03:30 AM",otherEarly:["04:30 AM","05:00 AM","06:00 AM"],mostLate:"12:00 PM",otherLate:["04:30 PM","11:30 AM","05:00 PM"],night:"NO"},
+      {name:"Lily Edwards",id:1384,unit:"Unit 1",mostEarly:"06:00 AM",otherEarly:["04:00 AM","05:30 AM","03:00 AM"],mostLate:"10:30 AM",otherLate:["11:30 AM","04:30 PM","03:30 PM"],night:"MAYBE"},
+      {name:"Hiro Chen",id:8846,unit:"Unit 2",mostEarly:"05:30 AM",otherEarly:["06:00 AM","04:30 AM","03:00 AM"],mostLate:"12:00 PM",otherLate:["04:30 PM","04:00 PM","01:30 PM"],night:"YES"},
+      {name:"Charlie Robinson",id:9512,unit:"Unit 3",mostEarly:"03:30 AM",otherEarly:["05:00 AM","06:00 AM","05:30 AM"],mostLate:"10:30 AM",otherLate:["03:00 PM","11:00 AM","04:00 PM"],night:"NO"},
+      {name:"Ava Taylor",id:3300,unit:"Unit 1",mostEarly:"05:00 AM",otherEarly:["03:30 AM","04:00 AM","06:00 AM"],mostLate:"11:00 AM",otherLate:["02:00 PM","03:00 PM","12:00 PM"],night:"MAYBE"},
+      {name:"Grace Taylor",id:6976,unit:"Unit 1",mostEarly:"05:30 AM",otherEarly:["04:30 AM","05:00 AM","03:00 AM"],mostLate:"02:30 PM",otherLate:["01:00 PM","03:00 PM","11:30 AM"],night:"YES"},
+      {name:"Li Wang",id:6471,unit:"Unit 3",mostEarly:"05:00 AM",otherEarly:["06:00 AM","03:00 AM","05:30 AM"],mostLate:"12:00 PM",otherLate:["04:30 PM","04:00 PM","10:30 AM"],night:"YES"},
+      {name:"Henry Johnson",id:4414,unit:"Unit 2",mostEarly:"04:30 AM",otherEarly:["03:30 AM","03:00 AM","05:00 AM"],mostLate:"03:00 PM",otherLate:["10:30 AM","03:30 PM","11:00 AM"],night:"YES"},
+      {name:"James Williams",id:3509,unit:"Unit 2",mostEarly:"04:00 AM",otherEarly:["06:00 AM","03:00 AM","04:30 AM"],mostLate:"11:00 AM",otherLate:["12:00 PM","01:30 PM","01:00 PM"],night:"NO"},
+      {name:"Priya Bhuva",id:6476,unit:"Unit 1",mostEarly:"04:00 AM",otherEarly:["05:30 AM","03:00 AM","03:30 AM"],mostLate:"03:30 PM",otherLate:["11:00 AM","10:30 AM","02:30 PM"],night:"MAYBE"},
+      {name:"Riya Kumar",id:8358,unit:"Unit 1",mostEarly:"03:00 AM",otherEarly:["03:30 AM","05:00 AM","05:30 AM"],mostLate:"12:30 PM",otherLate:["02:30 PM","03:00 PM","11:30 AM"],night:"YES"},
+      {name:"Henry Turner",id:5987,unit:"Unit 3",mostEarly:"05:00 AM",otherEarly:["04:30 AM","05:30 AM","03:30 AM"],mostLate:"11:00 AM",otherLate:["03:00 PM","12:30 PM","02:00 PM"],night:"YES"},
+      {name:"Charlie Turner",id:5701,unit:"Unit 1",mostEarly:"06:00 AM",otherEarly:["03:00 AM","03:30 AM","05:30 AM"],mostLate:"01:00 PM",otherLate:["12:00 PM","04:00 PM","11:00 AM"],night:"YES"},
+      {name:"Neha Patel",id:1419,unit:"Unit 2",mostEarly:"05:00 AM",otherEarly:["06:00 AM","04:30 AM","03:00 AM"],mostLate:"10:30 AM",otherLate:["11:30 AM","04:30 PM","02:30 PM"],night:"YES"},
+      {name:"Charlie Walker",id:3126,unit:"Unit 2",mostEarly:"05:30 AM",otherEarly:["04:30 AM","06:00 AM","05:00 AM"],mostLate:"02:00 PM",otherLate:["12:30 PM","12:00 PM","01:00 PM"],night:"NO"},
+      {name:"Ella Wood",id:7385,unit:"Unit 1",mostEarly:"05:30 AM",otherEarly:["05:00 AM","04:00 AM","03:30 AM"],mostLate:"12:00 PM",otherLate:["05:00 PM","02:00 PM","12:30 PM"],night:"NO"},
+      {name:"Charlie Taylor",id:6365,unit:"Unit 2",mostEarly:"03:00 AM",otherEarly:["04:00 AM","05:00 AM","05:30 AM"],mostLate:"12:00 PM",otherLate:["12:30 PM","01:30 PM","02:30 PM"],night:"NO"},
+      {name:"Emily Robinson",id:3121,unit:"Unit 3",mostEarly:"04:00 AM",otherEarly:["05:00 AM","03:30 AM","03:00 AM"],mostLate:"10:30 AM",otherLate:["12:00 PM","12:30 PM","04:30 PM"],night:"MAYBE"},
+      {name:"James Wilson",id:6033,unit:"Unit 2",mostEarly:"03:30 AM",otherEarly:["04:00 AM","06:00 AM","04:30 AM"],mostLate:"04:00 PM",otherLate:["01:30 PM","03:30 PM","03:00 PM"],night:"MAYBE"},
+      {name:"Isla White",id:7313,unit:"Unit 1",mostEarly:"03:30 AM",otherEarly:["06:00 AM","04:00 AM","04:30 AM"],mostLate:"05:00 PM",otherLate:["12:00 PM","11:00 AM","04:00 PM"],night:"YES"},
+      {name:"Oliver Taylor",id:7166,unit:"Unit 1",mostEarly:"06:00 AM",otherEarly:["04:00 AM","04:30 AM","05:00 AM"],mostLate:"01:30 PM",otherLate:["11:00 AM","04:00 PM","10:30 AM"],night:"YES"},
+      {name:"Henry Robinson",id:4675,unit:"Unit 3",mostEarly:"03:30 AM",otherEarly:["06:00 AM","03:00 AM","04:30 AM"],mostLate:"02:30 PM",otherLate:["12:00 PM","03:30 PM","11:00 AM"],night:"YES"},
+      {name:"Riya Bhuva",id:1439,unit:"Unit 1",mostEarly:"05:00 AM",otherEarly:["05:30 AM","03:00 AM","06:00 AM"],mostLate:"12:00 PM",otherLate:["11:00 AM","01:30 PM","11:30 AM"],night:"MAYBE"},
+      {name:"Rohan Bhuva",id:7688,unit:"Unit 3",mostEarly:"04:00 AM",otherEarly:["05:30 AM","04:30 AM","05:00 AM"],mostLate:"04:00 PM",otherLate:["10:30 AM","03:00 PM","11:30 AM"],night:"YES"},
+      {name:"Rohan Bhuva",id:9050,unit:"Unit 1",mostEarly:"04:00 AM",otherEarly:["05:30 AM","06:00 AM","04:30 AM"],mostLate:"02:00 PM",otherLate:["04:30 PM","01:30 PM","05:00 PM"],night:"YES"},
+      {name:"Olivia Jones",id:5990,unit:"Unit 1",mostEarly:"06:00 AM",otherEarly:["04:30 AM","04:00 AM","05:30 AM"],mostLate:"05:00 PM",otherLate:["12:00 PM","03:00 PM","02:00 PM"],night:"NO"},
+      {name:"George Green",id:8186,unit:"Unit 3",mostEarly:"06:00 AM",otherEarly:["03:30 AM","04:30 AM","05:30 AM"],mostLate:"12:00 PM",otherLate:["03:00 PM","11:00 AM","04:30 PM"],night:"YES"},
+      {name:"Isla Wilson",id:3957,unit:"Unit 1",mostEarly:"03:00 AM",otherEarly:["05:30 AM","05:00 AM","03:30 AM"],mostLate:"02:00 PM",otherLate:["11:30 AM","10:30 AM","01:30 PM"],night:"NO"},
+      {name:"Jack Brown",id:7360,unit:"Unit 3",mostEarly:"05:00 AM",otherEarly:["03:30 AM","06:00 AM","04:00 AM"],mostLate:"03:30 PM",otherLate:["12:30 PM","03:00 PM","01:30 PM"],night:"NO"},
+      {name:"Mei Kumar",id:1318,unit:"Unit 3",mostEarly:"05:30 AM",otherEarly:["03:00 AM","06:00 AM","04:30 AM"],mostLate:"10:30 AM",otherLate:["05:00 PM","03:30 PM","04:00 PM"],night:"YES"},
+      {name:"Henry Jones",id:7227,unit:"Unit 2",mostEarly:"06:00 AM",otherEarly:["03:00 AM","05:00 AM","05:30 AM"],mostLate:"01:30 PM",otherLate:["04:30 PM","02:00 PM","03:00 PM"],night:"NO"},
+      {name:"Ella Smith",id:2591,unit:"Unit 2",mostEarly:"04:30 AM",otherEarly:["04:00 AM","05:30 AM","03:30 AM"],mostLate:"01:00 PM",otherLate:["12:00 PM","05:00 PM","03:00 PM"],night:"MAYBE"},
+      {name:"Jack Smith",id:9420,unit:"Unit 2",mostEarly:"05:30 AM",otherEarly:["04:30 AM","06:00 AM","04:00 AM"],mostLate:"01:00 PM",otherLate:["10:30 AM","12:30 PM","03:00 PM"],night:"NO"},
+      {name:"Neha Patel",id:4194,unit:"Unit 2",mostEarly:"03:00 AM",otherEarly:["05:00 AM","06:00 AM","05:30 AM"],mostLate:"11:00 AM",otherLate:["03:00 PM","01:30 PM","05:00 PM"],night:"YES"},
+      {name:"Henry Hughes",id:4244,unit:"Unit 2",mostEarly:"04:30 AM",otherEarly:["03:30 AM","03:00 AM","06:00 AM"],mostLate:"11:30 AM",otherLate:["12:30 PM","11:00 AM","12:00 PM"],night:"MAYBE"},
+      {name:"Arjun Wang",id:6423,unit:"Unit 2",mostEarly:"03:00 AM",otherEarly:["03:30 AM","04:00 AM","04:30 AM"],mostLate:"11:00 AM",otherLate:["03:00 PM","02:30 PM","04:30 PM"],night:"MAYBE"},
+      {name:"Thomas Clarke",id:2099,unit:"Unit 3",mostEarly:"03:30 AM",otherEarly:["04:00 AM","05:00 AM","04:30 AM"],mostLate:"11:00 AM",otherLate:["03:30 PM","02:30 PM","05:00 PM"],night:"YES"},
+      {name:"Isla Johnson",id:1010,unit:"Unit 2",mostEarly:"05:00 AM",otherEarly:["04:00 AM","05:30 AM","06:00 AM"],mostLate:"02:30 PM",otherLate:["01:30 PM","03:00 PM","01:00 PM"],night:"YES"},
+      {name:"Charlie Walker",id:4474,unit:"Unit 1",mostEarly:"05:00 AM",otherEarly:["03:00 AM","03:30 AM","05:30 AM"],mostLate:"01:30 PM",otherLate:["03:30 PM","10:30 AM","02:30 PM"],night:"NO"},
+      {name:"Grace Thompson",id:6704,unit:"Unit 3",mostEarly:"05:30 AM",otherEarly:["05:00 AM","04:30 AM","03:00 AM"],mostLate:"04:30 PM",otherLate:["11:30 AM","02:00 PM","11:00 AM"],night:"MAYBE"},
+      {name:"Chloe Williams",id:9479,unit:"Unit 3",mostEarly:"05:30 AM",otherEarly:["06:00 AM","04:30 AM","03:00 AM"],mostLate:"02:00 PM",otherLate:["11:30 AM","01:30 PM","02:30 PM"],night:"YES"},
+      {name:"Leo Robinson",id:3477,unit:"Unit 3",mostEarly:"06:00 AM",otherEarly:["05:00 AM","04:30 AM","05:30 AM"],mostLate:"12:30 PM",otherLate:["01:00 PM","12:00 PM","11:30 AM"],night:"MAYBE"},
+      {name:"Henry Jones",id:6943,unit:"Unit 1",mostEarly:"05:00 AM",otherEarly:["05:30 AM","03:30 AM","04:30 AM"],mostLate:"12:00 PM",otherLate:["03:30 PM","02:30 PM","01:30 PM"],night:"YES"},
+      {name:"Charlie Smith",id:4478,unit:"Unit 2",mostEarly:"04:00 AM",otherEarly:["05:30 AM","03:00 AM","05:00 AM"],mostLate:"03:30 PM",otherLate:["12:30 PM","04:00 PM","05:00 PM"],night:"NO"},
+      {name:"James Green",id:9919,unit:"Unit 1",mostEarly:"04:30 AM",otherEarly:["04:00 AM","05:30 AM","03:30 AM"],mostLate:"04:00 PM",otherLate:["11:30 AM","01:30 PM","02:00 PM"],night:"YES"},
+      {name:"George Wright",id:7002,unit:"Unit 2",mostEarly:"05:30 AM",otherEarly:["06:00 AM","04:30 AM","05:00 AM"],mostLate:"02:30 PM",otherLate:["05:00 PM","10:30 AM","04:30 PM"],night:"NO"},
+      {name:"Charlie Johnson",id:8728,unit:"Unit 1",mostEarly:"04:30 AM",otherEarly:["05:00 AM","04:00 AM","06:00 AM"],mostLate:"10:30 AM",otherLate:["02:00 PM","12:30 PM","03:00 PM"],night:"YES"},
+      {name:"Lily Jones",id:8763,unit:"Unit 3",mostEarly:"03:30 AM",otherEarly:["04:00 AM","05:00 AM","05:30 AM"],mostLate:"11:30 AM",otherLate:["03:00 PM","12:00 PM","04:30 PM"],night:"MAYBE"},
+      {name:"George Wood",id:5835,unit:"Unit 3",mostEarly:"04:30 AM",otherEarly:["04:00 AM","03:30 AM","06:00 AM"],mostLate:"11:30 AM",otherLate:["12:30 PM","04:00 PM","03:00 PM"],night:"MAYBE"},
+      {name:"Grace Johnson",id:3258,unit:"Unit 2",mostEarly:"05:30 AM",otherEarly:["03:00 AM","04:00 AM","05:00 AM"],mostLate:"04:30 PM",otherLate:["10:30 AM","01:00 PM","12:00 PM"],night:"MAYBE"},
+      {name:"Harry Williams",id:7091,unit:"Unit 1",mostEarly:"03:30 AM",otherEarly:["05:00 AM","03:00 AM","04:30 AM"],mostLate:"11:30 AM",otherLate:["01:00 PM","03:30 PM","12:00 PM"],night:"NO"},
+      {name:"James Smith",id:8374,unit:"Unit 3",mostEarly:"03:30 AM",otherEarly:["04:00 AM","05:30 AM","04:30 AM"],mostLate:"01:30 PM",otherLate:["10:30 AM","03:30 PM","04:00 PM"],night:"MAYBE"},
+      {name:"James White",id:1308,unit:"Unit 2",mostEarly:"03:00 AM",otherEarly:["03:30 AM","04:30 AM","05:00 AM"],mostLate:"04:30 PM",otherLate:["01:30 PM","04:00 PM","01:00 PM"],night:"NO"},
+      {name:"Ava Davies",id:6867,unit:"Unit 3",mostEarly:"03:30 AM",otherEarly:["03:00 AM","05:30 AM","06:00 AM"],mostLate:"01:00 PM",otherLate:["03:30 PM","10:30 AM","11:30 AM"],night:"YES"},
+      {name:"Leo Turner",id:9475,unit:"Unit 2",mostEarly:"06:00 AM",otherEarly:["05:00 AM","04:30 AM","03:00 AM"],mostLate:"03:30 PM",otherLate:["01:00 PM","11:30 AM","02:30 PM"],night:"YES"},
+      {name:"Isla Davies",id:6994,unit:"Unit 1",mostEarly:"04:00 AM",otherEarly:["03:30 AM","06:00 AM","05:30 AM"],mostLate:"04:30 PM",otherLate:["03:30 PM","05:00 PM","03:00 PM"],night:"MAYBE"},
+      {name:"Sophia Smith",id:2452,unit:"Unit 3",mostEarly:"04:30 AM",otherEarly:["04:00 AM","03:00 AM","05:00 AM"],mostLate:"04:30 PM",otherLate:["03:00 PM","12:00 PM","04:00 PM"],night:"MAYBE"},
+      {name:"Jack Thompson",id:7704,unit:"Unit 2",mostEarly:"03:00 AM",otherEarly:["04:00 AM","05:00 AM","04:30 AM"],mostLate:"02:00 PM",otherLate:["04:30 PM","12:00 PM","02:30 PM"],night:"MAYBE"},
+      {name:"Riya Singh",id:5049,unit:"Unit 2",mostEarly:"06:00 AM",otherEarly:["04:30 AM","05:00 AM","04:00 AM"],mostLate:"01:30 PM",otherLate:["04:30 PM","10:30 AM","03:30 PM"],night:"NO"},
+      {name:"Lily Wood",id:6830,unit:"Unit 3",mostEarly:"03:30 AM",otherEarly:["06:00 AM","05:00 AM","05:30 AM"],mostLate:"02:00 PM",otherLate:["04:00 PM","05:00 PM","12:00 PM"],night:"YES"},
+      {name:"Ava Turner",id:3541,unit:"Unit 1",mostEarly:"03:00 AM",otherEarly:["04:30 AM","05:00 AM","05:30 AM"],mostLate:"04:00 PM",otherLate:["01:00 PM","03:00 PM","10:30 AM"],night:"YES"},
+      {name:"Grace Williams",id:3845,unit:"Unit 3",mostEarly:"05:30 AM",otherEarly:["04:30 AM","06:00 AM","03:00 AM"],mostLate:"04:00 PM",otherLate:["05:00 PM","10:30 AM","04:30 PM"],night:"MAYBE"},
+    ];
+
+    const units = [...new Set(employees.map(e => e.unit))].sort();
+    const NIGHT = "Night Shift";
+
+    function getAllShiftTimes() {
+      const early = new Set(), late = new Set();
+      employees.forEach(e => {
+        [e.mostEarly, ...e.otherEarly].forEach(t => early.add(t));
+        [e.mostLate, ...e.otherLate].forEach(t => late.add(t));
+      });
+      const sortTime = t => {
+        const [time, period] = t.split(" ");
+        const [h, m] = time.split(":").map(Number);
+        return (period === "PM" ? 12 : 0) + h * 60 + m;
+      };
+      return {
+        early: [...early].sort((a,b) => sortTime(a)-sortTime(b)),
+        late:  [...late].sort((a,b)  => sortTime(a)-sortTime(b)),
+      };
+    }
+
+    function matchesTime(emp, time, shiftType) {
+      if (shiftType === NIGHT) return emp.night !== "NO";
+      if (shiftType === "early") return [emp.mostEarly, ...emp.otherEarly].includes(time);
+      if (shiftType === "late")  return [emp.mostLate,  ...emp.otherLate].includes(time);
+      return false;
+    }
+
+    function isMostPreferred(emp, time, shiftType) {
+      if (shiftType === "early") return emp.mostEarly === time;
+      if (shiftType === "late")  return emp.mostLate  === time;
+      return false;
+    }
+
+    function nightBadge(pref) {
+      if (pref === "YES")   return { label:"Yes",   color:"#22c55e" };
+      if (pref === "NO")    return { label:"No",    color:"#ef4444" };
+      return                       { label:"Maybe", color:"#f59e0b" };
+    }
+
+    function App() {
+      const [step, setStep]             = useState(0);
+      const [myUnit, setMyUnit]         = useState(null);
+      const [targetUnit, setTargetUnit] = useState(null);
+      const [shiftType, setShiftType]   = useState(null);
+      const [currentTime, setCurrentTime] = useState(null);
+
+      const { early: earlyTimes, late: lateTimes } = useMemo(getAllShiftTimes, []);
+
+      const results = useMemo(() => {
+        if (step < 4) return [];
+        return employees
+          .filter(e => e.unit === targetUnit && matchesTime(e, currentTime, shiftType))
+          .sort((a,b) => isMostPreferred(b, currentTime, shiftType) - isMostPreferred(a, currentTime, shiftType));
+      }, [step, targetUnit, currentTime, shiftType]);
+
+      const reset = () => { setStep(0); setMyUnit(null); setTargetUnit(null); setShiftType(null); setCurrentTime(null); };
+      const back  = () => setStep(s => Math.max(0, s-1));
+
+      const s = {
+        wrap:    { minHeight:"100vh", background:"linear-gradient(135deg,#1e3a5f 0%,#16213e 100%)", display:"flex", alignItems:"center", justifyContent:"center", padding:"20px", fontFamily:"'Segoe UI',sans-serif" },
+        card:    { background:"#fff", borderRadius:16, padding:"32px 28px", width:"100%", maxWidth:480, boxShadow:"0 8px 40px rgba(0,0,0,0.25)" },
+        logo:    { display:"flex", alignItems:"center", gap:10, marginBottom:24 },
+        logoIcon:{ width:38, height:38, background:"linear-gradient(135deg,#2563eb,#7c3aed)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 },
+        logoText:{ fontWeight:700, fontSize:18, color:"#1e3a5f" },
+        title:   { fontSize:20, fontWeight:700, color:"#1e3a5f", marginBottom:6 },
+        sub:     { fontSize:14, color:"#64748b", marginBottom:22 },
+        progress:{ display:"flex", gap:6, marginBottom:28 },
+        dot: (active,done) => ({ flex:1, height:4, borderRadius:4, background: done?"#2563eb": active?"#93c5fd":"#e2e8f0", transition:"background 0.3s" }),
+        btnRow:  { display:"flex", flexWrap:"wrap", gap:10 },
+        unitBtn: sel => ({ flex:"1 1 calc(33% - 10px)", padding:"12px 8px", borderRadius:10, border:`2px solid ${sel?"#2563eb":"#e2e8f0"}`, background:sel?"#eff6ff":"#f8fafc", color:sel?"#1d4ed8":"#374151", fontWeight:600, fontSize:14, cursor:"pointer" }),
+        shiftBtn:(sel,color) => ({ flex:"1 1 calc(33% - 10px)", padding:"14px 8px", borderRadius:10, border:`2px solid ${sel?color:"#e2e8f0"}`, background:sel?color+"18":"#f8fafc", color:sel?color:"#374151", fontWeight:600, fontSize:13, cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:4 }),
+        timeBtn: sel => ({ flex:"1 1 calc(25% - 8px)", padding:"10px 4px", borderRadius:8, border:`2px solid ${sel?"#2563eb":"#e2e8f0"}`, background:sel?"#eff6ff":"#f8fafc", color:sel?"#1d4ed8":"#374151", fontWeight:600, fontSize:12, cursor:"pointer" }),
+        nextBtn: { width:"100%", marginTop:20, padding:"13px", borderRadius:10, background:"linear-gradient(135deg,#2563eb,#7c3aed)", color:"#fff", fontWeight:700, fontSize:15, border:"none", cursor:"pointer" },
+        backBtn: { background:"none", border:"none", color:"#64748b", fontWeight:600, fontSize:13, cursor:"pointer", marginBottom:16, display:"flex", alignItems:"center", gap:4 },
+        empCard: most => ({ background:most?"#eff6ff":"#f8fafc", border:`1.5px solid ${most?"#93c5fd":"#e2e8f0"}`, borderRadius:12, padding:"14px 16px", marginBottom:10, position:"relative" }),
+        badge:   color => ({ display:"inline-block", padding:"2px 8px", borderRadius:20, background:color+"22", color, fontSize:11, fontWeight:700 }),
+        mostTag: { position:"absolute", top:10, right:12, background:"#dbeafe", color:"#1d4ed8", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:20 },
+        empty:   { textAlign:"center", padding:"30px 0", color:"#94a3b8" },
+      };
+
+      const dots = [0,1,2,3].map(i => <div key={i} style={s.dot(step===i, step>i)} />);
+
+      return (
+        <div style={s.wrap}>
+          <div style={s.card}>
+            <div style={s.logo}>
+              <div style={s.logoIcon}>🔄</div>
+              <div style={s.logoText}>Shift Swap Finder</div>
+            </div>
+            <div style={s.progress}>{dots}</div>
+
+            {step > 0 && <button style={s.backBtn} onClick={back}>← Back</button>}
+
+            {/* Step 0 – My Unit */}
+            {step === 0 && <>
+              <div style={s.title}>Which unit are you in?</div>
+              <div style={s.sub}>Select your unit to get started.</div>
+              <div style={s.btnRow}>
+                {units.map(u => <button key={u} style={s.unitBtn(myUnit===u)} onClick={() => setMyUnit(u)}>{u}</button>)}
+              </div>
+              <button style={{...s.nextBtn, opacity:myUnit?1:0.4}} disabled={!myUnit} onClick={() => setStep(1)}>Next →</button>
+            </>}
+
+            {/* Step 1 – Target Unit */}
+            {step === 1 && <>
+              <div style={s.title}>Which unit to swap with?</div>
+              <div style={s.sub}>Select the unit you want to find a swap partner in.</div>
+              <div style={s.btnRow}>
+                {units.map(u => <button key={u} style={s.unitBtn(targetUnit===u)} onClick={() => setTargetUnit(u)}>{u}</button>)}
+              </div>
+              <button style={{...s.nextBtn, opacity:targetUnit?1:0.4}} disabled={!targetUnit} onClick={() => setStep(2)}>Next →</button>
+            </>}
+
+            {/* Step 2 – Shift Type */}
+            {step === 2 && <>
+              <div style={s.title}>What type of shift do you have?</div>
+              <div style={s.sub}>Choose your current shift category.</div>
+              <div style={s.btnRow}>
+                {[["early","🌅","Early Shift","#f59e0b"],["late","🌇","Late Shift","#2563eb"],[NIGHT,"🌙","Night Shift","#7c3aed"]].map(([val,icon,label,color]) =>
+                  <button key={val} style={s.shiftBtn(shiftType===val, color)} onClick={() => { setShiftType(val); setCurrentTime(null); }}>
+                    <span style={{fontSize:22}}>{icon}</span><span>{label}</span>
+                  </button>
+                )}
+              </div>
+              <button style={{...s.nextBtn, opacity:shiftType?1:0.4}} disabled={!shiftType} onClick={() => setStep(shiftType===NIGHT?4:3)}>Next →</button>
+            </>}
+
+            {/* Step 3 – Current Time */}
+            {step === 3 && <>
+              <div style={s.title}>What is your current start time?</div>
+              <div style={s.sub}>Select the start time of your current shift.</div>
+              <div style={s.btnRow}>
+                {(shiftType==="early"?earlyTimes:lateTimes).map(t =>
+                  <button key={t} style={s.timeBtn(currentTime===t)} onClick={() => setCurrentTime(t)}>{t}</button>
+                )}
+              </div>
+              <button style={{...s.nextBtn, opacity:currentTime?1:0.4}} disabled={!currentTime} onClick={() => setStep(4)}>Find Matches →</button>
+            </>}
+
+            {/* Step 4 – Results */}
+            {step === 4 && <>
+              <div style={s.title}>Potential Swap Partners</div>
+              <div style={s.sub}>
+                {shiftType===NIGHT
+                  ? <span>Employees in <b>{targetUnit}</b> open to night shifts</span>
+                  : <span>Employees in <b>{targetUnit}</b> who prefer <b>{currentTime}</b> ({shiftType} shift)</span>}
+              </div>
+              {results.length === 0
+                ? <div style={s.empty}><div style={{fontSize:36}}>😔</div><div style={{marginTop:8}}>No matches found in {targetUnit}.</div></div>
+                : results.map(emp => {
+                    const most = shiftType!==NIGHT && isMostPreferred(emp, currentTime, shiftType);
+                    const nb   = nightBadge(emp.night);
+                    return (
+                      <div key={emp.id} style={s.empCard(most)}>
+                        {most && <div style={s.mostTag}>⭐ Most Preferred</div>}
+                        <div style={{fontWeight:700, fontSize:15, color:"#1e3a5f", marginBottom:2}}>{emp.name}</div>
+                        <div style={{fontSize:12, color:"#64748b", marginBottom:8}}>ID: {emp.id} · {emp.unit}</div>
+                        {shiftType!==NIGHT && <>
+                          <div style={{fontSize:12, color:"#374151", marginBottom:3}}>
+                            <span style={{color:"#64748b"}}>🌅 Early:</span> <b>{emp.mostEarly}</b> <span style={{color:"#94a3b8"}}>+ {emp.otherEarly.join(", ")}</span>
+                          </div>
+                          <div style={{fontSize:12, color:"#374151", marginBottom:6}}>
+                            <span style={{color:"#64748b"}}>🌇 Late:</span> <b>{emp.mostLate}</b> <span style={{color:"#94a3b8"}}>+ {emp.otherLate.join(", ")}</span>
+                          </div>
+                        </>}
+                        <div style={{fontSize:12}}>🌙 Night: <span style={s.badge(nb.color)}>{nb.label}</span></div>
+                      </div>
+                    );
+                  })
+              }
+              <button style={{...s.nextBtn, marginTop:16, background:"#f1f5f9", color:"#1e3a5f"}} onClick={reset}>🔄 Start Over</button>
+            </>}
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
